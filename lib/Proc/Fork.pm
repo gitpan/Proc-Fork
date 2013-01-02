@@ -1,53 +1,77 @@
-#!/usr/bin/perl
-
 package Proc::Fork;
-
-$VERSION = 0.71; # also change it in the docs and in Fork/Runner.pm
-
+{
+  $Proc::Fork::VERSION = '0.800';
+}
 use strict;
 use warnings;
-use vars '$RUN_CLASS';
+use Scalar::Util ();
 
-$RUN_CLASS ||= 'Proc::Fork::Runner';
-eval "require $RUN_CLASS" or die $@;
+# ABSTRACT: simple, intuitive interface to the fork() system call
+
+my @block; BEGIN { @block = qw( parent child error retry ) }
+
+my $runner = do {
+	package Proc::Fork::Runner;
+{
+  $Proc::Fork::Runner::VERSION = '0.800';
+}
+	use Object::Tiny::Lvalue @block;
+	__PACKAGE__;
+};
+
+sub _croak { require Carp; goto &Carp::croak }
 
 sub run_fork(&) {
-	my ( $setup ) = @_;
-	my $runner = $setup->();
-	if ( not eval { $runner->isa( $RUN_CLASS ) } ) {
-		require Carp;
-		Carp::croak( "Syntax error (trailing garbage in block after Proc::Fork setup?)" );
+	my $setup = shift;
+
+	my $r = $runner->new;
+
+	my $last_block;
+	for my $code ( $setup->() ) {
+		my $block = ref $code;
+		unless ( $r->can( $block ) and 'CODE' eq Scalar::Util::reftype $code ) {
+			my $suggestion = defined $last_block
+				? "after $last_block clause"
+				: 'before setup in run_fork';
+			_croak "Garbage in Proc::Fork setup (missing semicolon $suggestion?)";
+		}
+		_croak "Duplicate $block clause in Proc::Fork setup" if $r->$block;
+		$r->$block = $code;
+		$last_block = $block;
 	}
-	$runner->run;
+
+	my $pid;
+	my $i;
+
+	{
+		$pid = fork;
+		last if defined $pid;
+		redo if $r->retry and $r->retry->( ++$i );
+		die "Cannot fork: $!\n" if not $r->error;
+		$r->error->();
+		return;
+	}
+
+	$_->( $pid || () ) for ( $pid ? $r->parent : $r->child ) || ();
+
 	return;
 }
 
-my $make_forkblock = sub {
-	my ( $config_key ) = shift;
-	sub (&;$) {
-		my ( $val, $config ) = @_;
-
-		# too many arguments or not a config hash as 2nd argument?
-		# then the user has almost certainly forgotten the trailing semicolon
-		if ( @_ > 2 or ( @_ == 2 and not eval { $config->isa( $RUN_CLASS ) } ) ) {
-			require Carp;
-			Carp::croak( "Syntax error (missing semicolon after $config_key clause?)" );
-		}
-
-		( $config ||= $RUN_CLASS->new )->set( $config_key, $val );
-
-		# if not called in void context, then we're not the final part of the call
-		# chain, so just pass the config up the chain
-		defined wantarray ? return $config : $config->run;
+sub _make_block {
+	my $block = shift;
+	sub (&;@) {
+		bless $_[0], $block;
+		if ( not defined wantarray ) { my $b = \@_; run_fork { @$b } } # backcompat
+		@_;
 	};
-};
+}
 
 require Exporter::Tidy;
 Exporter::Tidy->import(
 	default => [ ':all' ],
 	wrapper => [ 'run_fork' ],
-	blocks  => [ $RUN_CLASS->blocks ],
-	_map    => { map { $_ => $make_forkblock->( $_ ) } $RUN_CLASS->blocks },
+	blocks  => \@block,
+	_map    => { map { $_ => _make_block $_ } @block },
 );
 
 __PACKAGE__->import( ':blocks' );
@@ -56,13 +80,15 @@ __PACKAGE__->import( ':blocks' );
 
 __END__
 
+=pod
+
 =head1 NAME
 
-Proc::Fork - Simple, intuitive interface to the fork() system call
+Proc::Fork - simple, intuitive interface to the fork() system call
 
 =head1 VERSION
 
-This documentation describes Proc::Fork version 0.71
+version 0.800
 
 =head1 SYNOPSIS
 
@@ -277,32 +303,21 @@ This package exports the following symbols by default.
 
 =back
 
-=head1 DEPENDENCIES
-
-L<Carp>, which is part of the Perl distribution, and L<Exporter::Tidy>.
-
 =head1 BUGS AND LIMITATIONS
 
 None currently known, for what that's worth.
 
-Please report any bugs or feature requests to C<bug-proc-fork@rt.cpan.org>, or through the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Proc-Fork>. I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report bugs or feature requests to L<http://github.com/ap/Proc-Fork/issues>.
 
 =head1 AUTHOR
 
-Aristotle Pagaltzis, L<mailto:pagaltzis@gmx.de>
-
-Documentation by Eric J. Roode.
+Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2008 by Aristotle Pagaltzis. All rights Reserved.
+This software is copyright (c) 2012 by Aristotle Pagaltzis.
 
-This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See L<perlartistic>.
-
-=head1 DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

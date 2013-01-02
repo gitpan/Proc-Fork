@@ -1,0 +1,52 @@
+{
+   "abstract" : "simple, intuitive interface to the fork() system call",
+   "author" : [
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Proc-Fork",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter::Tidy" : "0",
+            "Object::Tiny::Lvalue" : "0",
+            "Scalar::Util" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "vars" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/ap/Proc-Fork/issues"
+      },
+      "homepage" : "http://github.com/ap/Proc-Fork",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ap/Proc-Fork"
+      }
+   },
+   "version" : "0.800"
+}
+
