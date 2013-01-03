@@ -14,3 +14,4 @@ lib/Proc/Fork.pm
 t/00.mock.t
 t/01.real.t
 t/cpants.t
+weaver.ini

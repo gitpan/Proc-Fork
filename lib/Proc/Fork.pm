@@ -1,6 +1,6 @@
 package Proc::Fork;
 {
-  $Proc::Fork::VERSION = '0.800';
+  $Proc::Fork::VERSION = '0.801';
 }
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ my @block; BEGIN { @block = qw( parent child error retry ) }
 my $runner = do {
 	package Proc::Fork::Runner;
 {
-  $Proc::Fork::Runner::VERSION = '0.800';
+  $Proc::Fork::Runner::VERSION = '0.801';
 }
 	use Object::Tiny::Lvalue @block;
 	__PACKAGE__;
@@ -88,7 +88,7 @@ Proc::Fork - simple, intuitive interface to the fork() system call
 
 =head1 VERSION
 
-version 0.800
+version 0.801
 
 =head1 SYNOPSIS
 
@@ -312,6 +312,8 @@ Please report bugs or feature requests to L<http://github.com/ap/Proc-Fork/issue
 =head1 AUTHOR
 
 Aristotle Pagaltzis <pagaltzis@gmx.de>
+
+Documentation by Eric J. Roode.
 
 =head1 COPYRIGHT AND LICENSE
 
