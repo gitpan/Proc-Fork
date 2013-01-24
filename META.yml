@@ -17,12 +17,10 @@ name: Proc-Fork
 requires:
   Carp: 0
   Exporter::Tidy: 0
-  Object::Tiny::Lvalue: 0
-  Scalar::Util: 0
   strict: 0
   warnings: 0
 resources:
   bugtracker: http://github.com/ap/Proc-Fork/issues
   homepage: http://github.com/ap/Proc-Fork
   repository: git://github.com/ap/Proc-Fork
-version: 0.801
+version: 0.802

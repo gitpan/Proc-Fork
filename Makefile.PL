@@ -25,12 +25,10 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Exporter::Tidy" => 0,
-    "Object::Tiny::Lvalue" => 0,
-    "Scalar::Util" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.801",
+  "VERSION" => "0.802",
   "test" => {
     "TESTS" => "t/*.t"
   }

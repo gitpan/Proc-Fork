@@ -23,8 +23,6 @@
          "requires" : {
             "Carp" : "0",
             "Exporter::Tidy" : "0",
-            "Object::Tiny::Lvalue" : "0",
-            "Scalar::Util" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -47,6 +45,6 @@
          "url" : "git://github.com/ap/Proc-Fork"
       }
    },
-   "version" : "0.801"
+   "version" : "0.802"
 }
 
