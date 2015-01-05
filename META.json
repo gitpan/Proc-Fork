@@ -4,7 +4,7 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -16,19 +16,22 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "Exporter::Tidy" : "0",
+            "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
             "Test::More" : "0",
             "vars" : "0"
          }
@@ -45,6 +48,6 @@
          "url" : "git://github.com/ap/Proc-Fork"
       }
    },
-   "version" : "0.802"
+   "version" : "0.803"
 }
 

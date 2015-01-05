@@ -1,10 +1,9 @@
-package Proc::Fork;
-{
-  $Proc::Fork::VERSION = '0.802';
-}
+use 5.006;
 use strict;
 use warnings;
 
+package Proc::Fork;
+$Proc::Fork::VERSION = '0.803';
 # ABSTRACT: simple, intuitive interface to the fork() system call
 
 use Exporter::Tidy (
@@ -61,13 +60,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Proc::Fork - simple, intuitive interface to the fork() system call
 
 =head1 VERSION
 
-version 0.802
+version 0.803
 
 =head1 SYNOPSIS
 
@@ -84,7 +85,7 @@ version 0.802
      }
      retry {
          my $attempts = shift;
-         # what to do if if fork() fails:
+         # what to do if fork() fails:
          # return true to try again, false to abort
          return if $attempts > 5;
          sleep 1, return 1;
@@ -295,6 +296,8 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 Documentation by Eric J. Roode.
 
 =head1 COPYRIGHT AND LICENSE
+
+This documentation is copyright (c) 2002 by Eric J. Roode.
 
 This software is copyright (c) 2013 by Aristotle Pagaltzis.
 
